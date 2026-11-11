@@ -1,0 +1,20 @@
+{
+  "/frames": {
+    "file": "frames.bin",
+    "type": "application/octet-stream",
+    "chunk": 5
+  },
+  "/frames?bad=1": {
+    "file": "corrupt.bin",
+    "type": "application/octet-stream",
+    "chunk": 3
+  },
+  "/frames?cut=1": {
+    "file": "frames.bin",
+    "type": "application/octet-stream",
+    "truncate": 10
+  },
+  "/channels/1": {
+    "file": "channels.json"
+  }
+}

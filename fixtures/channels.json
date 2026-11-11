@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "channels": {
+    "1": {
+      "instrument": "probe1",
+      "channel": "temperature",
+      "unit": "C",
+      "source": "gateway1"
+    }
+  },
+  "valid_from": "2026-01-01T00:00:00Z",
+  "valid_until": "2027-01-01T00:00:00Z"
+}
