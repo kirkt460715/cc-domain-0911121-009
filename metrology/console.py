@@ -4,7 +4,7 @@ import sys
 from .service import Service
 from .values import strict_json, canonical, require_object
 from .errors import MetrologyError, InputError
-from .ingress.readers import load_text, read_input, summarize
+from .ingress.readers import load_text, load_bytes, read_input, summarize
 from .ingress.mapping import Mapping
 from .ingress.delivery import DeliveryInbox
 from .output.snapshots import verify_export, atomic_write
@@ -162,6 +162,45 @@ def dispatch(app, request):
         return app.replay_plans.execute(options["id"])
     if action == "replay_status":
         return app.replay_plans.get(options["id"])
+    if action == "gateway_directory":
+        document = options["document"]
+        if isinstance(document, str):
+            document = strict_json(load_text(document))
+        return {"registered": app.directories.register(document)}
+    if action == "gateway_directories":
+        return {"directories": app.directories.listing()}
+    if action == "gateway_collect":
+        collect_options = {}
+        for key in ("received_at", "chunk_size", "timeout"):
+            if key in options:
+                collect_options[key] = options[key]
+        return app.gateway.collect_http(
+            options["session"], options["gateway"], options["url"], **collect_options
+        )
+    if action == "gateway_session":
+        return app.gateway.status(options["id"])
+    if action == "gateway_events":
+        return {"events": app.gateway.events(options["id"])}
+    if action == "gateway_frames":
+        return {
+            "frames": app.gateway.frames(
+                options["id"], status=options.get("status")
+            )
+        }
+    if action == "gateway_reprocess":
+        return app.gateway.reprocess_session(
+            options["session"],
+            batch_id=options.get("batch"),
+            received_at=options.get("received_at"),
+        )
+    if action == "gateway_reprocess_frame":
+        raw = load_bytes(options["file"])
+        return app.gateway.reprocess_frame(
+            options["gateway"],
+            raw,
+            batch_id=options["batch"],
+            received_at=options["received_at"],
+        )
     if action == "crosscheck":
         from .processing.crosscheck import PairedChannels
 

@@ -41,6 +41,18 @@ def load_text(path, maximum_bytes=16000000):
         raise InputError("input must be UTF-8") from exc
 
 
+def load_bytes(path, maximum_bytes=4096):
+    path = Path(path)
+    if path.is_symlink() or not path.is_file():
+        raise InputError("input must be a regular nonsymlink file")
+    if path.stat().st_size > maximum_bytes:
+        raise InputError("input exceeds byte limit")
+    raw = path.read_bytes()
+    if len(raw) > maximum_bytes:
+        raise InputError("input grew beyond byte limit")
+    return raw
+
+
 def parse_row(value, line, mapping):
     try:
         require_object(value)
